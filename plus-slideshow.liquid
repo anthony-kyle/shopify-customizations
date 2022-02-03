@@ -1,0 +1,771 @@
+{% comment %}
+=======================================================================
+Slideshow Styling
+=======================================================================
+{% endcomment %}
+
+<style type="text/css">
+  .plus-slideshow__wrapper {
+    --plus-slideshow-max-height: {{section.settings.plus_slideshow_max_height}};
+    height: var(--plus-slideshow-max-height);
+    position: relative;
+  }
+
+  .plus-slideshow .plus-slideshow__slide {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 1000ms linear;
+    width: 100%;
+    height: 100%;
+  }
+
+  .plus-slideshow .plus-slideshow__slide.active {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .plus-slideshow .plus-slideshow__slide-image {
+    max-height: var(--plus-slideshow-max-height);
+  	width: 100%;
+    min-width: 100%;
+    object-fit: cover;
+  }
+
+  .plus-slideshow .plus-slideshow__container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: {{section.settings.plus_slideshow_text_location_y}};
+    align-items:  {{section.settings.plus_slideshow_text_location_x}};;
+    padding: {{section.settings.plus_slideshow_content_padding_y}}% {{section.settings.plus_slideshow_content_padding_x}}%;
+  }
+
+  .slide__title {
+    color: {{section.settings.plus_slideshow_title_font_color}};
+    font-size: {{section.settings.plus_slideshow_title_font_size}}px;
+    max-width: 80%;
+    text-align: {{section.settings.plus_slideshow_text_align}};
+    transform: rotate({{section.settings.plus_slideshow_title_angle}}deg);
+  }
+
+  .slide__content {
+    color: {{section.settings.plus_slideshow_content_font_color}};
+    font-size: {{section.settings.plus_slideshow_content_font_size}}px;
+    max-width: 80%;
+    text-align: {{section.settings.plus_slideshow_text_align}};
+  }
+
+  .plus-slideshow__nav {
+    position: absolute;
+    bottom: 2rem;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .plus-slideshow__nav button {
+    background: transparent;
+    border: solid 2px {{section.settings.plus_slideshow_navbar_color}};
+    opacity: {{section.settings.plus_slideshow_navbar_opacity}};
+    border-radius: 50%;
+    width: 1.4em;
+    height: 1.4em;
+    padding: 0;
+    margin: 0px {{section.settings.plus_slideshow_nav_spacing | divided_by: 2}}px {{section.settings.plus_slideshow_nav_spacing}}px {{section.settings.plus_slideshow_nav_spacing | divided_by: 2}}px;
+  }
+
+  .plus-slideshow__nav button.active,
+  .plus-slideshow__nav button:hover,
+  .plus-slideshow__nav button:focus {
+    background-color: {{section.settings.plus_slideshow_navbar_color}};
+  }
+
+  .plus-slideshow__nav button.toggle-play {
+    fill: {{section.settings.plus_slideshow_navbar_color}};
+    stroke: {{section.settings.plus_slideshow_navbar_color}};
+    font-weight: 400;
+    /* font-size: 1.5em; */
+    color: {{section.settings.plus_slideshow_navbar_color}};
+    opacity: {{section.settings.plus_slideshow_navbar_opacity}};
+    transition: opacity 150ms ease-in;
+  }
+
+  .plus-slideshow__nav button.toggle-play.playing {
+    fill: transparent;
+  }
+
+  .plus-slideshow__nav button.toggle-play:hover,
+  .plus-slideshow__nav button.toggle-play:focus {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .plus-slideshow__nav button.toggle-play:hover::after {
+    opacity: 1;
+  }
+
+
+  .plus-slideshow__prev-next {
+    border: none;
+    position: absolute;
+    z-index: 2;
+    height: 100%;
+    width: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: {{section.settings.plus_prev_next_button_color}};
+    opacity: {{section.settings.plus_prev_next_button_hover_opacity}};
+  }
+
+  .plus-slideshow__prev-next svg {
+    fill: transparent;
+    stroke: {{section.settings.plus_prev_next_button_color}};
+    stroke-width: 5;
+    width: 21px;
+  }
+
+  .plus-slideshow__prev-next:focus {
+    box-shadow: none;
+  }
+
+  .plus-slideshow__prev-next:hover {
+    background-color: {{section.settings.plus_prev_next_button_hover_bg_color}};
+      color: {{section.settings.plus_prev_next_button_hover_color}};
+      opacity: {{section.settings.plus_prev_next_button_hover_opacity}};
+  }
+
+  .plus-slideshow__prev-next.previous-slide {
+    left: 0px;
+  }
+
+  .plus-slideshow__prev-next.next-slide {
+    right: 0px;
+  }
+
+  .plus-slideshow__button {
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    font: inherit;
+    padding: .9rem 3rem 1.1rem;
+    text-decoration: none;
+    border: 0;
+    border-radius: {{section.settings.plus_slideshow_button_border_radius}}px;
+    background-color: {{section.settings.plus_slideshow_button_background_color}};
+    color: {{section.settings.plus_slideshow_button_text_color}};
+    box-shadow: 0 0 0 .1rem {{section.settings.plus_slideshow_button_background_color}}55;
+    color: rgb(var(--color-button-text));
+    min-width: 12rem;
+    min-height: 4.5rem;
+    transition: box-shadow 250ms ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .plus-slideshow__button:hover {
+    background-color: {{section.settings.plus_slideshow_button_background_color_hover}};
+    color: {{section.settings.plus_slideshow_button_text_color_hover}};
+    box-shadow: 0 0 0 .2rem {{section.settings.plus_slideshow_button_background_color_hover}}AA;
+  }
+
+  @media screen and (max-width: 600px){
+    .plus-slideshow__wrapper,
+    .plus-slideshow .plus-slideshow__slide-image
+    {
+      height: {{section.settings.plus_slideshow_max_height}}px;
+      max-height: min({{section.settings.plus_slideshow_max_height}}px, {{section.settings.plus_slideshow_max_height_mobile}}vh);
+    }
+
+    .slide__title {
+      font-size: {{section.settings.plus_slideshow_title_font_size_mobile}}px;
+    }
+
+    .slide__content {
+      font-size: {{section.settings.plus_slideshow_content_font_size_mobile}}px;
+    }
+  }
+</style>
+
+{% comment %}
+=======================================================================
+Slideshow Markup
+=======================================================================
+{% endcomment %}
+
+<div class="plus-slideshow">
+  <div class="plus-slideshow__wrapper">
+    {% for slide in section.blocks %}
+      <div class="plus-slideshow__slide{% if forloop.first == true %} active{% endif %}">
+        <img
+          src="{{ slide.settings.image | img_url: '2000x' }}"
+          alt="{{ slide.settings.image.alt }}"
+          class="plus-slideshow__slide-image"
+          data-plus-width="{{ slide.settings.image.width }}"
+          data-plus-height="{{ slide.settings.image.height }}"
+          style="object-position: {{slide.settings.image_origin}}"
+        />
+        {% if slide.settings.link and slide.settings.whole_slide_link %}
+          <a href="{{ slide.settings.link }}">
+        {% endif %}
+        
+        <div class="plus-slideshow__container">
+          <h2 class="slide__title">{{ slide.settings.title }}</h2>
+          <div class="slide__content">{{ slide.settings.content }}</div>
+          {% unless slide.settings.whole_slide_link %}
+            {% if slide.settings.link and slide.settings.link_text %}
+              <a class="plus-slideshow__button" href="{{ slide.settings.link }}">{{slide.settings.link_text}}</a>
+            {% endif %}
+          {% endunless %}
+
+        </div>
+        
+        {% if slide.settings.link and slide.settings.whole_slide_link %}
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% comment %}
+=======================================================================
+Slideshow Functionality
+=======================================================================
+{% endcomment %}
+
+
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', ()=>{
+    window.Plus = window.Plus || {};
+    Plus.slideshow = new Slideshow
+  })
+
+  class Slideshow {
+    constructor() {
+      this.slideshowContainer = document.querySelector(".plus-slideshow__wrapper")
+      this.slides = document.querySelectorAll(".plus-slideshow__slide")
+      this.slideshowSpeed = {{section.settings.plus_slideshow_slide_speed}} * 1000
+      this.requiredHeight = this.getMaxRequiredHeight()
+      this.currentIndex = 0
+      this.maxIndex = this.slides.length - 1
+      this.autoplay = true
+      this.playButton = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" version="1.1"><path d="M 3 3 L 8 5 L 3 8 L 3 3"  stroke-width="1" /></svg>'
+      this.pauseButton = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" version="1.1"><path d="M 3 3 L 3 8 M 8 3 L 8 8"  stroke-width="3" /></svg>'
+      this.prevButton = '<svg xmlns="http://www.w3.org/2000/svg" width=21" height="50" version="1.1"><path d="M 18 10 L 3 25 L 18 40" /></svg>'
+      this.nextButton = '<svg xmlns="http://www.w3.org/2000/svg" width="21" height="50" version="1.1"><path d="M 3 10 L 18 25 L 3 40" /></svg>'
+      this.setSlideshowHeight()
+      this.autoplaySlide()
+      this.addNavigation()
+      this.watchForResize()
+    }
+
+    getMaxRequiredHeight() {
+      const imageDimensions = [];
+      document.querySelectorAll(".plus-slideshow__slide-image").forEach(img => {
+        imageDimensions.push({
+          width: parseInt(img.dataset.plusWidth),
+          height: parseInt(img.dataset.plusHeight)
+        });
+      });
+      const widestImg = imageDimensions.reduce((acc, img) => acc = acc.width > img.width ? acc : img, 0);
+      return Math.min(((window.innerWidth / widestImg.width ) * widestImg.height), {{section.settings.plus_slideshow_max_height}});
+    }
+
+    setSlideshowHeight() {
+      this.slideshowContainer.style.setProperty('--plus-slideshow-max-height', `${this.requiredHeight}px`);
+    }
+
+    changeSlide(targetSlide, manual) {
+      this.slides[this.currentIndex].classList.remove("active");
+      this.slides[targetSlide].classList.add("active");
+      this.nav.children[this.currentIndex].classList.remove('active');
+      this.nav.children[targetSlide].classList.add('active');
+      this.currentIndex = targetSlide;
+
+      if (manual){
+        this.stopPlaying();
+        if (this.autoplay){
+          this.autoplaySlide();
+        }
+      }
+    }
+
+    autoplaySlide(){
+      this.playing = setInterval(()=>{this.changeSlide(this.calculateIndex())}, this.slideshowSpeed)
+      if (this.toggle) {
+        this.toggle.classList.add('playing');
+        this.toggle.innerHTML = this.pauseButton;
+      }
+    }
+
+    calculateIndex(prev = false){
+      if (prev){
+        return 0 > this.currentIndex - 1 ? this.maxIndex : this.currentIndex - 1;
+      }
+      return this.maxIndex < this.currentIndex + 1 ? 0 : this.currentIndex + 1;
+    }
+
+    nextSlide(){
+      this.changeSlide(this.calculateIndex(), true);
+    }
+
+    prevSlide(){
+      this.changeSlide(this.calculateIndex(true), true);
+    }
+
+    stopPlaying(){
+      clearInterval(this.playing);
+      this.toggle.innerHTML = this.playButton;
+      this.toggle.classList.remove('playing');
+    }
+
+    addNavigation(){
+      this.nav = document.createElement('nav');
+      this.nav.classList.add('plus-slideshow__nav');
+      for (let i = 0; i <= this.maxIndex; i++){
+        const el = document.createElement('button');
+        if (i == 0) el.classList.add('active');
+        el.addEventListener('click', ()=>this.changeSlide(i, true));
+        this.nav.append(el);
+      }
+      this.toggle = document.createElement('button');
+      this.toggle.classList.add('toggle-play', 'playing');
+      this.toggle.innerHTML = this.pauseButton;
+      this.toggle.addEventListener('click', ()=>this.togglePlay());
+      this.nav.append(this.toggle);
+      this.slideshowContainer.append(this.nav);
+      this.addPrevNext();
+    }
+    addPrevNext(){
+      this.prev = document.createElement('button');
+      this.prev.classList.add('plus-slideshow__prev-next', 'previous-slide');
+      this.prev.innerHTML = this.prevButton;
+      this.prev.addEventListener('click', ()=>this.prevSlide());
+      this.next = document.createElement('button');
+      this.next.classList.add('plus-slideshow__prev-next', 'next-slide');
+      this.next.innerHTML = this.nextButton;
+      this.next.addEventListener('click', ()=>this.nextSlide());
+      this.slideshowContainer.append(this.prev, this.next);
+    }
+
+    togglePlay(){
+      if (this.autoplay){
+        this.stopPlaying();
+      } else {
+        this.autoplaySlide();
+      }
+      this.autoplay = !this.autoplay;
+    }
+
+    watchForResize(){
+      window.addEventListener('resize', function(e){
+        Plus.slideshow.requiredHeight = Plus.slideshow.getMaxRequiredHeight();
+        Plus.slideshow.setSlideshowHeight();
+      })
+    }
+  }
+</script>
+
+
+
+{% comment %}
+=======================================================================
+Slideshow Section Config
+=======================================================================
+{% endcomment %}
+
+{% schema %} 
+{ 
+  "name": "[Plus] Slideshow", 
+  "blocks": [ 
+    { 
+      "type": "slide",
+      "name": "Slide", 
+      "settings": [ 
+        { 
+          "type": "text", 
+          "id": "title", 
+          "default": "Slide Title", 
+          "label": "Slide title" 
+        }, 
+        { 
+          "type": "richtext", 
+          "id": "content",
+          "label": "Slide content" 
+        }, 
+        { 
+          "type": "image_picker", 
+          "id": "image", 
+          "label": "Slide Image" 
+        },
+        { 
+          "type": "select", 
+          "id": "image_origin", 
+          "label": "Image anchor position", 
+          "options": [ 
+            { 
+              "value": "top left", 
+              "label": " Top Left" 
+            }, 
+            { 
+              "value": "top center", 
+              "label": "Top Center" 
+            }, 
+            { 
+              "value": "top right", 
+              "label": "Top Right" 
+            },
+            { 
+              "value": "center left", 
+              "label": "Middle Left" 
+            }, 
+            { 
+              "value": "center center", 
+              "label": "Middle Center" 
+            }, 
+            { 
+              "value": "center right", 
+              "label": "Middle Right" 
+            },
+            { 
+              "value": "bottom left", 
+              "label": "Bottom Left" 
+            }, 
+            { 
+              "value": "bottom center", 
+              "label": "Bottom Center" 
+            }, 
+            { 
+              "value": "bottom right", 
+              "label": "Bottom Right" 
+            } 
+          ],
+          "default": "center center" 
+        }, 
+        { 
+          "type": "url", 
+          "id": "link", 
+          "label": "Slide Link" 
+        },
+        { 
+          "type": "text", 
+          "id": "link_text", 
+          "label": "Link Text" 
+        },
+        { 
+          "type": "checkbox", 
+          "id": "whole_slide_link", 
+          "label": "Make whole slide clickable",
+          "info": "Enabling this will make the whole slide be a link, and remove the button"
+        }
+      ] 
+    } 
+  ],
+  "settings": [ 
+    { 
+      "type": "header", 
+      "content":"Content settings" 
+    }, 
+    {
+      "type":"color", 
+      "id":"plus_slideshow_title_font_color", 
+      "default":"#ffffff",
+      "label":"Title color" 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_title_font_size", 
+      "min":8, 
+      "max":100, 
+      "step":1,
+      "unit":"px", 
+      "label":"Title font size", 
+      "default":60 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_title_font_size_mobile", 
+      "min":8, 
+      "max":100, 
+      "step":1,
+      "unit":"px", 
+      "label":"Title size (Mobile)", 
+      "default":30 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_title_angle", 
+      "min":-180, 
+      "max":180, 
+      "step":6,
+      "unit":"deg", 
+      "label":"Title angle", 
+      "default":0 
+    }, 
+    { 
+      "type":"color",
+      "id":"plus_slideshow_content_font_color", 
+      "default":"#ffffff", 
+      "label":"Content color" 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_content_font_size", 
+      "min":8, 
+      "max":60, 
+      "step":1,
+      "unit":"px", 
+      "label":"Content font size", 
+      "default":16 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_content_font_size_mobile", 
+      "min":8, 
+      "max":60, 
+      "step":1,
+      "unit":"px", 
+      "label":"Content size (Mobile)", 
+      "default":16 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_button_border_radius", 
+      "min":0, 
+      "max":50, 
+      "step":1,
+      "unit":"px", 
+      "label":"Button corner radius", 
+      "default":0 
+    }, 
+    {
+      "type":"color",
+      "id": "plus_slideshow_button_background_color",
+      "default": "#464646",
+      "label": "Button Background Color"
+    },
+    {
+      "type":"color",
+      "id": "plus_slideshow_button_text_color",
+      "default": "#ffffff",
+      "label": "Button Text Color"
+    },
+    {
+      "type":"color",
+      "id": "plus_slideshow_button_background_color_hover",
+      "default": "#464646",
+      "label": "Button hover background color"
+    },
+    {
+      "type":"color",
+      "id": "plus_slideshow_button_text_color_hover",
+      "default": "#ffffff",
+      "label": "Button hover text color"
+    },
+    { 
+      "type": "header",
+      "content":"Slideshow settings" 
+    }, 
+    { 
+      "type": "select", 
+      "id": "plus_slideshow_text_align", 
+      "label": "Text alignment", 
+      "options": [ 
+        { 
+          "value": "left", 
+          "label": "Left" 
+        }, 
+        { 
+          "value": "center", 
+          "label": "Center" 
+        }, 
+        { 
+          "value": "right", 
+          "label": "Right" 
+        } 
+      ],
+      "default": "center" 
+    }, 
+    { 
+      "type": "select", 
+      "id": "plus_slideshow_text_location_x", 
+      "label": "Horizontal Text Position", 
+      "options": [ 
+        { 
+          "value": "flex-start", 
+          "label": " Left" 
+        }, 
+        { 
+          "value": "center", 
+          "label": "Center" 
+        }, 
+        { 
+          "value": "flex-end", 
+          "label": "Right" 
+        }
+      ],
+      "default": "center" 
+    }, 
+    { 
+      "type": "select", 
+      "id": "plus_slideshow_text_location_y", 
+      "label": "Vertical Text Position", 
+      "options": [ 
+        { 
+          "value": "flex-start", 
+          "label": " Top" 
+        }, 
+        { 
+          "value": "center", 
+          "label": "Middle" 
+        }, 
+        { 
+          "value": "flex-end", 
+          "label": "Bottom" 
+        }
+      ],
+      "default": "center" 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_content_padding_x", 
+      "min":0, 
+      "max":30, 
+      "step":1,
+      "unit":"%", 
+      "label":"Slide side content padding", 
+      "default":0 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_content_padding_y", 
+      "min":0, 
+      "max":30, 
+      "step":1,
+      "unit":"%", 
+      "label":"Slide vertical content padding", 
+      "default":0 
+    }, 
+    { 
+      "type": "paragraph",
+      "content":"Use the below settings to customize your slideshow. All settings must be saved in order to be previewed." 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_slide_speed", 
+      "min":1, 
+      "max":60, 
+      "step":1, 
+      "unit":"s",
+      "label":"Slide change speed", 
+      "default":10 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_max_height", 
+      "min":100, 
+      "max":2000, 
+      "step":25, 
+      "unit":"px",
+      "label":"Max image height", 
+      "default":500 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_slideshow_max_height_mobile", 
+      "min":10, 
+      "max":100, 
+      "step":10, 
+      "unit":"%",
+      "label":"Max image height (mobile)", 
+      "default":90 
+    }, 
+    { 
+      "type": "header",
+      "content":"Navigation" 
+    }, 
+    { 
+      "type":"color",
+      "id":"plus_slideshow_navbar_color", 
+      "default":"#ffffff", 
+      "label":"Navigation color" 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_navbar_opacity", 
+      "min":0,
+      "max":1, 
+      "step":0.1, 
+      "label":"Navigation opacity", 
+      "default":0.5 
+    },
+    { 
+      "type": "range", 
+      "id":"plus_slideshow_nav_spacing", 
+      "min":0, 
+      "max":100,
+      "step":1, 
+      "unit":"px",
+      "label":"Nav button spacing", 
+      "default":20
+    }, 
+    { 
+      "type": "header",
+      "content":"Next / Previous Slide Switchers" 
+    }, 
+    {
+      "type":"color", 
+      "id":"plus_prev_next_button_color", 
+      "default":"#ffffff",
+      "label":"Switcher color" 
+    }, 
+    { 
+      "type": "range",
+      "id":"plus_prev_next_button_opacity", 
+      "min":0, 
+      "max":1, 
+      "step":0.1,
+      "label":"Switcher opacity", 
+      "default":0.5 
+    }, 
+    { 
+      "type":"color",
+      "id":"plus_prev_next_button_hover_color", 
+      "default":"#ffffff", 
+      "label":"Switcher hover color" 
+    }, 
+    { 
+      "type":"color", 
+      "id":"plus_prev_next_button_hover_bg_color",
+      "default":"#232323", 
+      "label":"Switcher hover background color" 
+    }, 
+    { 
+      "type": "range", 
+      "id":"plus_prev_next_button_hover_opacity", 
+      "min":0, 
+      "max":1,
+      "step":0.1, 
+      "label":"Switcher hover opacity", 
+      "default":0.2 
+    }
+  ], 
+  "presets": [ 
+    {
+      "name": "plus-slideshow", 
+      "category": "Plus" 
+    } 
+  ] 
+} 
+{% endschema %}
